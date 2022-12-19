@@ -3,6 +3,7 @@ package keygen
 import (
 	"crypto/rand"
 	"fmt"
+	"log"
 
 	"github.com/capsule-org/multi-party-sig/internal/round"
 	"github.com/capsule-org/multi-party-sig/pkg/math/curve"
@@ -19,16 +20,19 @@ const Rounds round.Number = 5
 func Start(info round.Info, pl *pool.Pool, c *config.Config) protocol.StartFunc {
 	return func(sessionID []byte) (_ round.Session, err error) {
 		var helper *round.Helper
+		log.Println("XXXXX1")
 		if c == nil {
 			helper, err = round.NewSession(info, sessionID, pl)
 		} else {
 			helper, err = round.NewSession(info, sessionID, pl, c)
 		}
+		log.Println("XXXXX2")
 		if err != nil {
 			return nil, fmt.Errorf("keygen: %w", err)
 		}
 
 		group := helper.Group()
+		log.Println("XXXXX3")
 
 		if c != nil {
 			PublicSharesECDSA := make(map[party.ID]curve.Point, len(c.Public))
@@ -43,10 +47,12 @@ func Start(info round.Info, pl *pool.Pool, c *config.Config) protocol.StartFunc 
 				VSSSecret:                 polynomial.NewPolynomial(group, helper.Threshold(), group.NewScalar()), // fᵢ(X) deg(fᵢ) = t, fᵢ(0) = 0
 			}, nil
 		}
+		log.Println("XXXXX4")
 
 		// sample fᵢ(X) deg(fᵢ) = t, fᵢ(0) = secretᵢ
 		VSSConstant := sample.Scalar(rand.Reader, group)
 		VSSSecret := polynomial.NewPolynomial(group, helper.Threshold(), VSSConstant)
+		log.Println("XXXXX5")
 		return &round1{
 			Helper:    helper,
 			VSSSecret: VSSSecret,
