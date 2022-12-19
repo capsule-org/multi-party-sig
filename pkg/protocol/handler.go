@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"sync"
 	"log"
+	"sync"
 
 	"github.com/capsule-org/multi-party-sig/internal/round"
 	"github.com/capsule-org/multi-party-sig/pkg/hash"
@@ -63,9 +63,9 @@ func NewMultiHandler(create StartFunc, sessionID []byte) (*MultiHandler, error) 
 		broadcastHashes: map[round.Number][]byte{},
 		out:             make(chan *Message, 2*r.N()),
 	}
-	log.Println("YYYYY1",h)
+	log.Println("YYYYY1", h)
 	h.finalize()
-	log.Println("YYYYY2",h)
+	log.Println("YYYYY2", h)
 	return h, nil
 }
 
@@ -239,14 +239,20 @@ func (h *MultiHandler) finalize() {
 	if !h.receivedAll() {
 		return
 	}
+	log.Println("tttttt1")
 	if !h.checkBroadcastHash() {
 		h.abort(errors.New("broadcast verification failed"))
 		return
 	}
+	log.Println("tttttt2")
 
 	out := make(chan *round.Message, h.currentRound.N()+1)
+	log.Println("tttttt3")
+
 	// since we pass a large enough channel, we should never get an error
 	r, err := h.currentRound.Finalize(out)
+	log.Println("tttttt4")
+
 	close(out)
 	// either we got an error due to some problem on our end (sampling etc)
 	// or the new round is nil (should not happen)
@@ -254,6 +260,7 @@ func (h *MultiHandler) finalize() {
 		h.abort(err, h.currentRound.SelfID())
 		return
 	}
+	log.Println("tttttt5")
 
 	// forward messages with the correct header.
 	for roundMsg := range out {
@@ -271,11 +278,13 @@ func (h *MultiHandler) finalize() {
 			Broadcast:             roundMsg.Broadcast,
 			BroadcastVerification: h.broadcastHashes[r.Number()-1],
 		}
+
 		if msg.Broadcast {
 			h.store(msg)
 		}
 		h.out <- msg
 	}
+	log.Println("tttttt6")
 
 	roundNumber := r.Number()
 	// if we get a round with the same number, we can safely assume that we got the same one.
@@ -298,6 +307,9 @@ func (h *MultiHandler) finalize() {
 		return
 	default:
 	}
+
+	log.Println("tttttt7")
+
 
 	if _, ok := r.(round.BroadcastRound); ok {
 		// handle queued broadcast messages, which will then check the subsequent normal message
@@ -324,6 +336,9 @@ func (h *MultiHandler) finalize() {
 			}
 		}
 	}
+
+	log.Println("tttttt8")
+
 
 	// we only do this if the current round has changed
 	h.finalize()
