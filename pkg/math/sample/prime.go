@@ -125,7 +125,8 @@ func tryBlumPrime(rand io.Reader) *safenum.Nat {
 	remainder := new(big.Int)
 	log.Println("tryBlumPrime8")
 	
-	for _, prime := range thePrimes {
+	for h, prime := range thePrimes {
+		log.Println("tryBlumPrime9", len(thePrimes), h)
 		// We want to eliminate all x = 0, 1 mod r, so we figure out where the
 		// next multiple is, relative to base, and eliminate from there.
 		//
@@ -136,13 +137,18 @@ func tryBlumPrime(rand io.Reader) *safenum.Nat {
 		r := int(remainder.Uint64())
 		primeInt := int(prime)
 		firstMultiple := primeInt - r
+		log.Println("tryBlumPrime9.1")
 		if r == 0 {
 			firstMultiple = 0
 		}
+		log.Println("tryBlumPrime9.2")
+		
 		for i := firstMultiple; i+1 < len(sieve); i += primeInt {
 			sieve[i] = false
 			sieve[i+1] = false
 		}
+		log.Println("tryBlumPrime9.3")
+		
 	}
 	p := new(big.Int)
 	q := new(big.Int)
