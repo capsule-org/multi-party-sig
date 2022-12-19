@@ -222,7 +222,7 @@ func NewLockedReader(r io.Reader) *LockedReader {
 // read is raced, but you won't end up reading the same value twice, or otherwise
 // messing up the state of the reader.
 func (r *LockedReader) Read(p []byte) (int, error) {
-	r.m.Lock()
-	defer r.m.Unlock()
+// 	r.m.Lock()
+// 	defer r.m.Unlock()
 	return r.reader.Read(p)
 }
