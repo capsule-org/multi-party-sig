@@ -5,6 +5,7 @@ import (
 	"math"
 	"math/big"
 	"sync"
+	"log"
 
 	"github.com/capsule-org/multi-party-sig/internal/params"
 	"github.com/capsule-org/multi-party-sig/pkg/pool"
@@ -160,7 +161,9 @@ func tryBlumPrime(rand io.Reader) *safenum.Nat {
 // p, q are safe primes ((p - 1) / 2 is also prime), and Blum primes (p = 3 mod 4)
 // n = pq.
 func Paillier(rand io.Reader, pl *pool.Pool) (p, q *safenum.Nat) {
+	log.Println("RRRRR1")
 	reader := pool.NewLockedReader(rand)
+	log.Println("RRRRR2")
 	results := pl.Search(2, func() interface{} {
 		q := tryBlumPrime(reader)
 		// You have to do this, because of how Go handles nil.
@@ -169,6 +172,7 @@ func Paillier(rand io.Reader, pl *pool.Pool) (p, q *safenum.Nat) {
 		}
 		return q
 	})
+	log.Println("RRRRR3")
 	p, q = results[0].(*safenum.Nat), results[1].(*safenum.Nat)
 	return
 }
