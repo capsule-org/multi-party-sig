@@ -165,7 +165,9 @@ func Paillier(rand io.Reader, pl *pool.Pool) (p, q *safenum.Nat) {
 	reader := pool.NewLockedReader(rand)
 	log.Println("RRRRR2")
 	results := pl.Search(2, func() interface{} {
+		log.Println("RRRRR-----///")
 		q := tryBlumPrime(reader)
+		log.Println("RRRRR-----")
 		// You have to do this, because of how Go handles nil.
 		if q == nil {
 			return nil
