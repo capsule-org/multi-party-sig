@@ -62,8 +62,7 @@ func (r *round1) StoreMessage(round.Message) error { return nil }
 // - sample ridᵢ <- {0,1}ᵏ
 // - sample cᵢ <- {0,1}ᵏ
 // - commit to message.
-func (r *round1) Final
-(out chan<- *round.Message) (round.Session, error) {
+func (r *round1) Finalize(out chan<- *round.Message) (round.Session, error) {
 	// generate Paillier and Pedersen
 	log.Println("oooooo1")
 	PaillierSecret := paillier.NewSecretKey(nil)
