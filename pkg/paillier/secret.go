@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"errors"
 	"fmt"
+	"log"
 
 	"github.com/capsule-org/multi-party-sig/internal/params"
 	"github.com/capsule-org/multi-party-sig/pkg/math/arith"
@@ -70,24 +71,37 @@ func NewSecretKey(pl *pool.Pool) *SecretKey {
 
 // NewSecretKeyFromPrimes generates a new SecretKey. Assumes that P and Q are prime.
 func NewSecretKeyFromPrimes(P, Q *safenum.Nat) *SecretKey {
+	log.Println("kkkkkk1")
 	oneNat := new(safenum.Nat).SetUint64(1)
+	log.Println("kkkkkk2")
+	
 
 	n := arith.ModulusFromFactors(P, Q)
 
 	nNat := n.Nat()
+	log.Println("kkkkkk3")
+	
 	nPlusOne := new(safenum.Nat).Add(nNat, oneNat, -1)
 	// Tightening is fine, since n is public
 	nPlusOne.Resize(nPlusOne.TrueLen())
+	log.Println("kkkkkk4")
+	
 
 	pMinus1 := new(safenum.Nat).Sub(P, oneNat, -1)
 	qMinus1 := new(safenum.Nat).Sub(Q, oneNat, -1)
 	phi := new(safenum.Nat).Mul(pMinus1, qMinus1, -1)
+	log.Println("kkkkkk5")
+	
 	// ϕ⁻¹ mod N
 	phiInv := new(safenum.Nat).ModInverse(phi, n.Modulus)
 
 	pSquared := pMinus1.Mul(P, P, -1)
 	qSquared := qMinus1.Mul(Q, Q, -1)
+	log.Println("kkkkkk6")
+	
 	nSquared := arith.ModulusFromFactors(pSquared, qSquared)
+	log.Println("kkkkkk7")
+	
 
 	return &SecretKey{
 		p:      P,
