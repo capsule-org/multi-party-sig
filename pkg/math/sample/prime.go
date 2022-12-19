@@ -19,6 +19,7 @@ func primes(below uint32) []uint32 {
 	for i := 2; i < len(sieve); i++ {
 		sieve[i] = true
 	}
+	log.Println("Primw§§§1")
 	// Now, we remove the multiples of every prime number we encounter
 	for p := 2; p*p < len(sieve); p++ {
 		if !sieve[p] {
@@ -29,7 +30,10 @@ func primes(below uint32) []uint32 {
 		for i := p << 1; i < len(sieve); i += p {
 			sieve[i] = false
 		}
+	        log.Println("Primw§§§---")
 	}
+	log.Println("Primw§§§2")
+	
 	// It is believed that there are approximately N / log N primes below N, so this
 	// bounds is a decent estimate of our output size
 	nF := float64(below)
@@ -72,9 +76,13 @@ var sievePool = sync.Pool{
 }
 
 func tryBlumPrime(rand io.Reader) *safenum.Nat {
+	log.Println("tryBlumPrime0")
+	
 	initPrimes.Do(func() {
 		thePrimes = primes(primeBound)
 	})
+	log.Println("tryBlumPrime0.5")
+	
 
 	bytes := make([]byte, (params.BitsBlumPrime+7)/8)
 
@@ -82,6 +90,8 @@ func tryBlumPrime(rand io.Reader) *safenum.Nat {
 	if err != nil {
 		return nil
 	}
+	log.Println("tryBlumPrime1")
+	
 	// For both p and (p - 1) / 2 to be prime, it must be the case that p = 3 mod 4
 
 	// Clear low bits to ensure that our number is 3 mod 4
@@ -91,12 +101,17 @@ func tryBlumPrime(rand io.Reader) *safenum.Nat {
 	// This makes it so that when multiplying two primes generated with this method,
 	// the resulting number has twice the number of bits.
 	bytes[0] |= 0xC0
+	log.Println("tryBlumPrime1.5")
+	
 	base := new(big.Int).SetBytes(bytes)
 
 	// sieve checks the candidacy of base, base+1, base+2, etc.
 	sievePtr := sievePool.Get().(*[]bool)
+	log.Println("tryBlumPrime2")
 	sieve := *sievePtr
 	defer sievePool.Put(sievePtr)
+	log.Println("tryBlumPrime3")
+	
 	for i := 0; i < len(sieve); i++ {
 		sieve[i] = true
 	}
@@ -108,6 +123,8 @@ func tryBlumPrime(rand io.Reader) *safenum.Nat {
 	}
 	// sieve out primes
 	remainder := new(big.Int)
+	log.Println("tryBlumPrime8")
+	
 	for _, prime := range thePrimes {
 		// We want to eliminate all x = 0, 1 mod r, so we figure out where the
 		// next multiple is, relative to base, and eliminate from there.
@@ -129,6 +146,8 @@ func tryBlumPrime(rand io.Reader) *safenum.Nat {
 	}
 	p := new(big.Int)
 	q := new(big.Int)
+	log.Println("tryBlumPrime10")
+	
 	for delta := 0; delta < len(sieve); delta++ {
 		if !sieve[delta] {
 			continue
