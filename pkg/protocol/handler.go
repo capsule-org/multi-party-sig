@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"sync"
+	"log"
 
 	"github.com/capsule-org/multi-party-sig/internal/round"
 	"github.com/capsule-org/multi-party-sig/pkg/hash"
@@ -50,6 +51,7 @@ type MultiHandler struct {
 // NewMultiHandler expects a StartFunc for the desired protocol. It returns a handler that the user can interact with.
 func NewMultiHandler(create StartFunc, sessionID []byte) (*MultiHandler, error) {
 	r, err := create(sessionID)
+	log.Println("YYYYY", r, err)
 	if err != nil {
 		return nil, fmt.Errorf("protocol: failed to create round: %w", err)
 	}
@@ -61,7 +63,9 @@ func NewMultiHandler(create StartFunc, sessionID []byte) (*MultiHandler, error) 
 		broadcastHashes: map[round.Number][]byte{},
 		out:             make(chan *Message, 2*r.N()),
 	}
+	log.Println("YYYYY1",h)
 	h.finalize()
+	log.Println("YYYYY2",h)
 	return h, nil
 }
 
