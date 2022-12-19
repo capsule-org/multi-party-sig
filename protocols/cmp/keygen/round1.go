@@ -3,6 +3,7 @@ package keygen
 import (
 	"crypto/rand"
 	"errors"
+	"log"
 
 	"github.com/capsule-org/multi-party-sig/internal/round"
 	"github.com/capsule-org/multi-party-sig/internal/types"
@@ -50,7 +51,8 @@ func (r *round1) VerifyMessage(round.Message) error { return nil }
 // StoreMessage implements round.Round.
 func (r *round1) StoreMessage(round.Message) error { return nil }
 
-// Finalize implements round.Round
+// 
+ze implements round.Round
 //
 // - sample Paillier (pᵢ, qᵢ)
 // - sample Pedersen Nᵢ, sᵢ, tᵢ
@@ -62,20 +64,27 @@ func (r *round1) StoreMessage(round.Message) error { return nil }
 // - commit to message.
 func (r *round1) Finalize(out chan<- *round.Message) (round.Session, error) {
 	// generate Paillier and Pedersen
+	log.Println("oooooo1")
 	PaillierSecret := paillier.NewSecretKey(nil)
+	log.Println("oooooo2")
 	SelfPaillierPublic := PaillierSecret.PublicKey
 	SelfPedersenPublic, PedersenSecret := PaillierSecret.GeneratePedersen()
 
 	ElGamalSecret, ElGamalPublic := sample.ScalarPointPair(rand.Reader, r.Group())
+	log.Println("oooooo3")
 
 	// save our own share already so we are consistent with what we receive from others
 	SelfShare := r.VSSSecret.Evaluate(r.SelfID().Scalar(r.Group()))
 
+	log.Println("oooooo4")
 	// set Fᵢ(X) = fᵢ(X)•G
 	SelfVSSPolynomial := polynomial.NewPolynomialExponent(r.VSSSecret)
+	log.Println("oooooo5")
 
 	// generate Schnorr randomness
 	SchnorrRand := zksch.NewRandomness(rand.Reader, r.Group(), nil)
+	log.Println("oooooo6")
+	
 
 	// Sample RIDᵢ
 	SelfRID, err := types.NewRID(rand.Reader)
@@ -86,11 +95,15 @@ func (r *round1) Finalize(out chan<- *round.Message) (round.Session, error) {
 	if err != nil {
 		return r, errors.New("failed to sample c")
 	}
+	log.Println("oooooo7")
+	
 
 	// commit to data in message 2
 	SelfCommitment, Decommitment, err := r.HashForID(r.SelfID()).Commit(
 		SelfRID, chainKey, SelfVSSPolynomial, SchnorrRand.Commitment(), ElGamalPublic,
 		SelfPedersenPublic.N(), SelfPedersenPublic.S(), SelfPedersenPublic.T())
+	log.Println("oooooo8", err)
+	
 	if err != nil {
 		return r, errors.New("failed to commit")
 	}
@@ -101,6 +114,8 @@ func (r *round1) Finalize(out chan<- *round.Message) (round.Session, error) {
 	if err != nil {
 		return r, err
 	}
+	log.Println("oooooo9", err)
+	
 
 	nextRound := &round2{
 		round1:         r,
@@ -120,6 +135,8 @@ func (r *round1) Finalize(out chan<- *round.Message) (round.Session, error) {
 		SchnorrRand:    SchnorrRand,
 		Decommitment:   Decommitment,
 	}
+	log.Println("oooooo10", err)
+	
 	return nextRound, nil
 }
 
