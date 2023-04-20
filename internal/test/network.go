@@ -1,6 +1,8 @@
 package test
 
 import (
+	"fmt"
+	"runtime/debug"
 	"sync"
 
 	"github.com/capsule-org/multi-party-sig/pkg/party"
@@ -51,6 +53,12 @@ func (n *Network) Next(id party.ID) <-chan *protocol.Message {
 }
 
 func (n *Network) Send(msg *protocol.Message) {
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Printf("Recovered from panic in Send: %v\n", r)
+			debug.PrintStack()
+		}
+	}()
 	n.mtx.Lock()
 	defer n.mtx.Unlock()
 	for id, c := range n.listenChannels {

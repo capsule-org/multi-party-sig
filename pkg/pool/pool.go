@@ -1,8 +1,10 @@
 package pool
 
 import (
+	"fmt"
 	"io"
 	"runtime"
+	"runtime/debug"
 	"sync"
 	"sync/atomic"
 )
@@ -64,6 +66,12 @@ func workerSearch(results []interface{}, ctrChanged chan<- struct{}, f func(int)
 
 // worker starts up a new worker, listening to commands, and producing results
 func worker(commands <-chan command) {
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Printf("Recovered from panic in worker: %v\n", r)
+			debug.PrintStack()
+		}
+	}()
 	for c := range commands {
 		if c.search {
 			workerSearch(c.results, c.ctrChanged, c.f, c.ctr)
