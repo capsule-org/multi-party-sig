@@ -70,7 +70,7 @@ var sievePool = sync.Pool{
 	},
 }
 
-func tryBlumPrime(rand io.Reader) *saferith.Nat {
+func TryBlumPrime(rand io.Reader) *saferith.Nat {
 	initPrimes.Do(func() {
 		thePrimes = primes(primeBound)
 	})
@@ -162,7 +162,7 @@ func tryBlumPrime(rand io.Reader) *saferith.Nat {
 func Paillier(rand io.Reader, pl *pool.Pool) (p, q *saferith.Nat) {
 	reader := pool.NewLockedReader(rand)
 	results := pl.Search(2, func() interface{} {
-		q := tryBlumPrime(reader)
+		q := TryBlumPrime(reader)
 		// You have to do this, because of how Go handles nil.
 		if q == nil {
 			return nil
