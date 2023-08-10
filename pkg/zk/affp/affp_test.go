@@ -4,13 +4,10 @@ import (
 	"crypto/rand"
 	"testing"
 
-<<<<<<< HEAD
 	"github.com/capsule-org/multi-party-sig/pkg/hash"
 	"github.com/capsule-org/multi-party-sig/pkg/math/curve"
 	"github.com/capsule-org/multi-party-sig/pkg/math/sample"
 	"github.com/capsule-org/multi-party-sig/pkg/zk"
-=======
->>>>>>> taurusgroup/main
 	"github.com/cronokirby/saferith"
 	"github.com/fxamacker/cbor/v2"
 	"github.com/stretchr/testify/assert"
