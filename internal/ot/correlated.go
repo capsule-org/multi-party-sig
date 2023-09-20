@@ -3,7 +3,6 @@ package ot
 import (
 	"crypto/rand"
 	"errors"
-	"fmt"
 
 	"github.com/capsule-org/multi-party-sig/internal/params"
 	"github.com/capsule-org/multi-party-sig/pkg/hash"
@@ -24,15 +23,11 @@ type CorreOTSendSetup struct {
 }
 
 func (c *CorreOTSendSetup) MarshalBinary() ([]byte, error) {
-	delta, err := cbor.Marshal(c._Delta)
-	if err != nil {
-		return nil, err
-	}
 	kDelta, err := cbor.Marshal(c._K_Delta)
 	if err != nil {
 		return nil, err
 	}
-	return append(delta, kDelta...), nil
+	return append(c._Delta[:], kDelta...), nil
 }
 
 func (c *CorreOTSendSetup) UnmarshalBinary(data []byte) error {
@@ -158,35 +153,20 @@ func (c *CorreOTReceiveSetup) MarshalBinary() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("length of binary in marshal")
-	fmt.Println(len(k0))
-	fmt.Println(len(k1))
-	fmt.Println(c)
-	// fmt.Println(len(append(k0, k1...)))
-	// fmt.Println(append(k0, k1...))
 	return append(k0, k1...), nil
 }
 
 func (c *CorreOTReceiveSetup) UnmarshalBinary(data []byte) error {
-	fmt.Println("length of binary in unmarshal")
-	// fmt.Println(len(data))
-	// fmt.Println(data)
 	kLen := len(data) / 2
 	k0 := data[:kLen]
 	k1 := data[kLen:]
-	fmt.Println(len(k0))
-	fmt.Println(len(k1))
-	var k0Holder [params.OTParam][params.OTBytes]byte
-	var k1Holder [params.OTParam][params.OTBytes]byte
-	if err := cbor.Unmarshal(k0, &k0Holder); err != nil {
+
+	if err := cbor.Unmarshal(k0, &c._K_0); err != nil {
 		return err
 	}
-	if err := cbor.Unmarshal(k1, &k1Holder); err != nil {
+	if err := cbor.Unmarshal(k1, &c._K_1); err != nil {
 		return err
 	}
-	c._K_0 = k0Holder
-	c._K_1 = k1Holder
-	fmt.Println(c)
 	return nil
 }
 
