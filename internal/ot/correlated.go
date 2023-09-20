@@ -23,11 +23,27 @@ type CorreOTSendSetup struct {
 }
 
 func (c *CorreOTSendSetup) MarshalBinary() ([]byte, error) {
-	return cbor.Marshal(c)
+	delta, err := cbor.Marshal(c._Delta)
+	if err != nil {
+		return nil, err
+	}
+	kDelta, err := cbor.Marshal(c._K_Delta)
+	if err != nil {
+		return nil, err
+	}
+	return append(delta, kDelta...), nil
 }
 
 func (c *CorreOTSendSetup) UnmarshalBinary(data []byte) error {
-	return cbor.Unmarshal(data, c)
+	delta := data[:params.OTBytes]
+	kDelta := data[params.OTBytes:]
+	if err := cbor.Unmarshal(delta, &c._Delta); err != nil {
+		return err
+	}
+	if err := cbor.Unmarshal(kDelta, &c._K_Delta); err != nil {
+		return err
+	}
+	return nil
 }
 
 // CorreOTSetupSender contains all of the state to run the Sender's setup of a Correlated OT.
@@ -133,11 +149,27 @@ type CorreOTReceiveSetup struct {
 }
 
 func (c *CorreOTReceiveSetup) MarshalBinary() ([]byte, error) {
-	return cbor.Marshal(c)
+	k0, err := cbor.Marshal(c._K_0)
+	if err != nil {
+		return nil, err
+	}
+	k1, err := cbor.Marshal(c._K_1)
+	if err != nil {
+		return nil, err
+	}
+	return append(k0, k1...), nil
 }
 
 func (c *CorreOTReceiveSetup) UnmarshalBinary(data []byte) error {
-	return cbor.Unmarshal(data, c)
+	k0 := data[:params.OTParam*params.OTBytes]
+	k1 := data[params.OTParam*params.OTBytes:]
+	if err := cbor.Unmarshal(k0, &c._K_0); err != nil {
+		return err
+	}
+	if err := cbor.Unmarshal(k1, &c._K_1); err != nil {
+		return err
+	}
+	return nil
 }
 
 // CorreOTSetupReceiver holds the Receiver's state on a Correlated OT Setup.
