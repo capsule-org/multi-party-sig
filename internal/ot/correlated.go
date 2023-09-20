@@ -171,12 +171,16 @@ func (c *CorreOTReceiveSetup) UnmarshalBinary(data []byte) error {
 	// fmt.Println(data)
 	k0 := data[:params.OTParam*params.OTBytes]
 	k1 := data[params.OTParam*params.OTBytes:]
-	if err := cbor.Unmarshal(k0, &c._K_0); err != nil {
+	var k0Holder [params.OTParam][params.OTBytes]byte
+	var k1Holder [params.OTParam][params.OTBytes]byte
+	if err := cbor.Unmarshal(k0, &k0Holder); err != nil {
 		return err
 	}
-	if err := cbor.Unmarshal(k1, &c._K_1); err != nil {
+	if err := cbor.Unmarshal(k1, &k1Holder); err != nil {
 		return err
 	}
+	c._K_0 = k0Holder
+	c._K_1 = k1Holder
 	fmt.Println(c)
 	return nil
 }
