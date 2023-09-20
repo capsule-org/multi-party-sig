@@ -171,8 +171,9 @@ func (c *CorreOTReceiveSetup) UnmarshalBinary(data []byte) error {
 	fmt.Println("length of binary in unmarshal")
 	// fmt.Println(len(data))
 	// fmt.Println(data)
-	k0 := data[:params.OTParam*params.OTBytes]
-	k1 := data[params.OTParam*params.OTBytes:]
+	kLen := len(data) / 2
+	k0 := data[:kLen]
+	k1 := data[kLen:]
 	fmt.Println(len(k0))
 	fmt.Println(len(k1))
 	var k0Holder [params.OTParam][params.OTBytes]byte
