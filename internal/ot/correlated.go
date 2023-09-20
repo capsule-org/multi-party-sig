@@ -37,9 +37,10 @@ func (c *CorreOTSendSetup) MarshalBinary() ([]byte, error) {
 func (c *CorreOTSendSetup) UnmarshalBinary(data []byte) error {
 	delta := data[:params.OTBytes]
 	kDelta := data[params.OTBytes:]
-	if err := cbor.Unmarshal(delta, &c._Delta); err != nil {
-		return err
-	}
+	copy(c._Delta[:], delta[:])
+	// if err := cbor.Unmarshal(delta, &c._Delta); err != nil {
+	// 	return err
+	// }
 	if err := cbor.Unmarshal(kDelta, &c._K_Delta); err != nil {
 		return err
 	}
