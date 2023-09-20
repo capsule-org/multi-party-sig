@@ -3,6 +3,7 @@ package ot
 import (
 	"crypto/rand"
 	"errors"
+	"fmt"
 
 	"github.com/capsule-org/multi-party-sig/internal/params"
 	"github.com/capsule-org/multi-party-sig/pkg/hash"
@@ -157,10 +158,14 @@ func (c *CorreOTReceiveSetup) MarshalBinary() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println("length of binary in marshal")
+	fmt.Println(len(append(k0, k1...)))
 	return append(k0, k1...), nil
 }
 
 func (c *CorreOTReceiveSetup) UnmarshalBinary(data []byte) error {
+	fmt.Println("length of binary in unmarshal")
+	fmt.Println(len(data))
 	k0 := data[:params.OTParam*params.OTBytes]
 	k1 := data[params.OTParam*params.OTBytes:]
 	if err := cbor.Unmarshal(k0, &c._K_0); err != nil {
