@@ -159,15 +159,16 @@ func (c *CorreOTReceiveSetup) MarshalBinary() ([]byte, error) {
 		return nil, err
 	}
 	fmt.Println("length of binary in marshal")
-	fmt.Println(len(append(k0, k1...)))
-	fmt.Println(append(k0, k1...))
+	fmt.Println(c)
+	// fmt.Println(len(append(k0, k1...)))
+	// fmt.Println(append(k0, k1...))
 	return append(k0, k1...), nil
 }
 
 func (c *CorreOTReceiveSetup) UnmarshalBinary(data []byte) error {
 	fmt.Println("length of binary in unmarshal")
-	fmt.Println(len(data))
-	fmt.Println(data)
+	// fmt.Println(len(data))
+	// fmt.Println(data)
 	k0 := data[:params.OTParam*params.OTBytes]
 	k1 := data[params.OTParam*params.OTBytes:]
 	if err := cbor.Unmarshal(k0, &c._K_0); err != nil {
@@ -176,6 +177,7 @@ func (c *CorreOTReceiveSetup) UnmarshalBinary(data []byte) error {
 	if err := cbor.Unmarshal(k1, &c._K_1); err != nil {
 		return err
 	}
+	fmt.Println(c)
 	return nil
 }
 
