@@ -20,7 +20,7 @@ type (
 // Because ConfigReceiver contains group dependent data, it needs to be initialized
 // with a concrete group to be unmarshalled correctly.
 func EmptyConfigReceiver(group curve.Curve) *ConfigReceiver {
-	return &ConfigReceiver{Setup: &ot.CorreOTReceiveSetup{}, SecretShare: group.NewScalar(), Public: group.NewPoint()}
+	return &ConfigReceiver{Setup: new(ot.CorreOTReceiveSetup), SecretShare: group.NewScalar(), Public: group.NewPoint()}
 }
 
 // EmptyConfigSender creates a ConfigSender that's ready to be unmarshalled.
@@ -28,7 +28,7 @@ func EmptyConfigReceiver(group curve.Curve) *ConfigReceiver {
 // Because ConfigSender contains group dependent data, it needs to be initialized
 // with a concrete group to be unmarshalled correctly.
 func EmptyConfigSender(group curve.Curve) *ConfigSender {
-	return &ConfigSender{Setup: &ot.CorreOTSendSetup{}, SecretShare: group.NewScalar(), Public: group.NewPoint()}
+	return &ConfigSender{Setup: new(ot.CorreOTSendSetup), SecretShare: group.NewScalar(), Public: group.NewPoint()}
 }
 
 // Keygen initiates the Doerner key generation protocol.
