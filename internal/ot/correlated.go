@@ -31,13 +31,10 @@ func (c *CorreOTSendSetup) MarshalBinary() ([]byte, error) {
 }
 
 func (c *CorreOTSendSetup) UnmarshalBinary(data []byte) error {
-	delta := data[:params.OTBytes]
+	cDelta := data[:params.OTBytes]
 	kDelta := data[params.OTBytes:]
-	copy(c._Delta[:], delta[:])
-	if err := cbor.Unmarshal(kDelta, &c._K_Delta); err != nil {
-		return err
-	}
-	return nil
+	copy(c._Delta[:], cDelta[:])
+	return cbor.Unmarshal(kDelta, &c._K_Delta)
 }
 
 // CorreOTSetupSender contains all of the state to run the Sender's setup of a Correlated OT.
