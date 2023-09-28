@@ -159,10 +159,7 @@ func (c *CorreOTReceiveSetup) UnmarshalBinary(data []byte) error {
 	if err := cbor.Unmarshal(k0, &c._K_0); err != nil {
 		return err
 	}
-	if err := cbor.Unmarshal(k1, &c._K_1); err != nil {
-		return err
-	}
-	return nil
+	return cbor.Unmarshal(k1, &c._K_1)
 }
 
 // CorreOTSetupReceiver holds the Receiver's state on a Correlated OT Setup.
