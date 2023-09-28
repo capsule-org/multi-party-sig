@@ -9,6 +9,7 @@ import (
 	"github.com/capsule-org/multi-party-sig/pkg/math/curve"
 	"github.com/capsule-org/multi-party-sig/pkg/pool"
 	"github.com/cronokirby/saferith"
+	"github.com/fxamacker/cbor/v2"
 	"github.com/zeebo/blake3"
 )
 
@@ -19,6 +20,21 @@ type CorreOTSendSetup struct {
 	// Each column of this matrix is taken from one of the Receiver's corresponding
 	// columns, based on the corresponding bit of Delta.
 	_K_Delta [params.OTParam][params.OTBytes]byte
+}
+
+func (c *CorreOTSendSetup) MarshalBinary() ([]byte, error) {
+	kDelta, err := cbor.Marshal(c._K_Delta)
+	if err != nil {
+		return nil, err
+	}
+	return append(c._Delta[:], kDelta...), nil
+}
+
+func (c *CorreOTSendSetup) UnmarshalBinary(data []byte) error {
+	delta := data[:params.OTBytes]
+	kDelta := data[params.OTBytes:]
+	copy(c._Delta[:], delta[:])
+	return cbor.Unmarshal(kDelta, &c._K_Delta)
 }
 
 // CorreOTSetupSender contains all of the state to run the Sender's setup of a Correlated OT.
@@ -121,6 +137,29 @@ func (r *CorreOTSetupSender) Round3(msg *CorreOTSetupReceiveRound3Message) (*Cor
 type CorreOTReceiveSetup struct {
 	_K_0 [params.OTParam][params.OTBytes]byte
 	_K_1 [params.OTParam][params.OTBytes]byte
+}
+
+func (c *CorreOTReceiveSetup) MarshalBinary() ([]byte, error) {
+	k0, err := cbor.Marshal(c._K_0)
+	if err != nil {
+		return nil, err
+	}
+	k1, err := cbor.Marshal(c._K_1)
+	if err != nil {
+		return nil, err
+	}
+	return append(k0, k1...), nil
+}
+
+func (c *CorreOTReceiveSetup) UnmarshalBinary(data []byte) error {
+	kLen := len(data) / 2
+	k0 := data[:kLen]
+	k1 := data[kLen:]
+
+	if err := cbor.Unmarshal(k0, &c._K_0); err != nil {
+		return err
+	}
+	return cbor.Unmarshal(k1, &c._K_1)
 }
 
 // CorreOTSetupReceiver holds the Receiver's state on a Correlated OT Setup.
